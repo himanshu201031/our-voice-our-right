@@ -8,9 +8,10 @@ import { useLocalization } from '../App';
 
 interface Props {
   data: DistrictData;
+  isOffline: boolean;
 }
 
-const Dashboard: React.FC<Props> = ({ data }) => {
+const Dashboard: React.FC<Props> = ({ data, isOffline }) => {
     const { t } = useLocalization();
     const lastUpdatedDate = new Date().toLocaleDateString('en-GB', {
         day: 'numeric', month: 'long', year: 'numeric'
@@ -18,6 +19,12 @@ const Dashboard: React.FC<Props> = ({ data }) => {
 
   return (
     <div className="space-y-8 animate-fade-in">
+        {isOffline && (
+            <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 rounded-md shadow-sm" role="alert">
+                <p className="font-bold">{t('offlineModeTitle')}</p>
+                <p className="text-sm">{t('offlineModeMessage')}</p>
+            </div>
+        )}
         <div className="text-right text-gray-500 italic">
             {t('lastUpdated')}: {lastUpdatedDate}
         </div>

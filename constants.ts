@@ -188,6 +188,8 @@ export const translations = {
     generating: "Generating summary...",
     geolocationError: "Could not get location. Please select manually.",
     selectDistrictPrompt: "Please select a district to view data.",
+    offlineModeTitle: "Offline Mode",
+    offlineModeMessage: "You are viewing cached data. Information may be outdated.",
   },
   hi: {
     title: "हमारी आवाज, हमारे अधिकार",
@@ -211,5 +213,7 @@ export const translations = {
     generating: "सारांश बना रहा है...",
     geolocationError: "स्थान प्राप्त नहीं हो सका। कृपया मैन्युअल रूप से चयन करें।",
     selectDistrictPrompt: "डेटा देखने के लिए कृपया एक जिला चुनें।",
+    offlineModeTitle: "ऑफलाइन मोड",
+    offlineModeMessage: "आप कैश्ड डेटा देख रहे हैं। जानकारी पुरानी हो सकती है।",
   },
 };

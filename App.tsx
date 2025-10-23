@@ -5,6 +5,7 @@ import Header from './components/Header';
 import DistrictSelector from './components/DistrictSelector';
 import Dashboard from './components/Dashboard';
 import ErrorBoundary from './components/ErrorBoundary';
+import { getDistrictData as getCachedData, saveDistrictData as cacheData } from './services/dbService';
 
 // Language Context
 interface LanguageContextType {
@@ -21,6 +22,7 @@ const App: React.FC = () => {
   const [selectedDistrictId, setSelectedDistrictId] = useState<string | null>(null);
   const [districtData, setDistrictData] = useState<DistrictData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isOfflineData, setIsOfflineData] = useState<boolean>(false);
 
   useEffect(() => {
     const savedDistrictId = localStorage.getItem('selectedDistrictId');
@@ -29,22 +31,49 @@ const App: React.FC = () => {
     }
   }, []);
 
-  const handleDistrictSelect = (districtId: string | null) => {
+  const handleDistrictSelect = async (districtId: string | null) => {
     setIsLoading(true);
     setSelectedDistrictId(districtId);
-    if (districtId) {
-      // Simulate API call
-      setTimeout(() => {
-        const data = MOCK_DISTRICT_DATA[districtId];
-        setDistrictData(data);
-        localStorage.setItem('selectedDistrictId', districtId);
-        setIsLoading(false);
-      }, 500);
-    } else {
+    
+    if (!districtId) {
       setDistrictData(null);
       localStorage.removeItem('selectedDistrictId');
       setIsLoading(false);
+      return;
     }
+
+    // 1. Try to load from cache first for a fast response
+    try {
+      const cachedData = await getCachedData(districtId);
+      if (cachedData) {
+        setDistrictData(cachedData);
+        setIsOfflineData(true); // Assume it's offline until network confirms otherwise
+        setIsLoading(false); // Stop loading indicator, show cached data
+      }
+    } catch (error) {
+        console.error("Error reading from IndexedDB:", error);
+    }
+
+    // 2. Then, fetch from network (simulated)
+    setTimeout(async () => {
+      const data = MOCK_DISTRICT_DATA[districtId];
+      if (data) {
+        setDistrictData(data);
+        setIsOfflineData(false);
+        localStorage.setItem('selectedDistrictId', districtId);
+        try {
+          await cacheData(data); // Update cache with fresh data
+        } catch (error) {
+          console.error("Error saving to IndexedDB:", error);
+        }
+      } else {
+        if (!districtData) { 
+            setDistrictData(null);
+            localStorage.removeItem('selectedDistrictId');
+        }
+      }
+      setIsLoading(false); 
+    }, 500);
   };
 
   const t = (key: keyof typeof translations.en) => {
@@ -69,7 +98,7 @@ const App: React.FC = () => {
                   <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-brand-blue"></div>
               </div>
             ) : districtData ? (
-              <Dashboard data={districtData} />
+              <Dashboard data={districtData} isOffline={isOfflineData} />
             ) : (
               <div className="text-center text-gray-500 mt-16 p-8 bg-white/50 rounded-lg shadow-sm">
                   <h2 className="text-2xl font-semibold text-brand-blue">{t('selectDistrictPrompt')}</h2>
