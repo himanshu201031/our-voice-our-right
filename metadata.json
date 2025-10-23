@@ -1,0 +1,7 @@
+{
+  "name": "Our Voice, Our Rights - MGNREGA Dashboard",
+  "description": "An accessible dashboard for rural Indian citizens to view and understand MGNREGA performance data for their district and state, with features like data visualization, simplified insights, and voice narration.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
