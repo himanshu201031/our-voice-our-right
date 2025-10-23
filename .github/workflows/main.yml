@@ -1,30 +1,43 @@
+# GitHub Actions workflow for building and testing the application
 name: CI Build and Test
 
+# Controls when the workflow will run
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
+  # This workflow contains a single job called "build-and-test"
   build-and-test:
+    # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
+    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Sets up a Node.js environment
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18.x'
-          cache: 'npm'
+          # cache: 'npm' # Disabled: To enable caching, run `npm install` locally and commit the generated package-lock.json file.
 
+      # Installs project dependencies
       - name: Install dependencies
         run: npm install
 
+      # Builds the production version of the app
+      # Assumes a "build" script in your package.json, e.g., "vite build"
       - name: Build application
-        run: CI=true npm run build
+        run: npm run build
 
+      # Runs tests
+      # Assumes a "test" script in your package.json
       - name: Run tests
-        run: npm test -- --watchAll=false
+        run: npm test
