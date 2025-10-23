@@ -65,17 +65,17 @@ const Insights: React.FC<Props> = ({ data }) => {
         <button
           onClick={handleGenerateSummary}
           disabled={isLoading}
-          className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-brand-green text-white font-semibold rounded-lg hover:bg-opacity-90 transition-colors disabled:bg-gray-400"
+          className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-brand-green text-white font-semibold rounded-lg hover:bg-opacity-90 transition-colors disabled:bg-green-400 disabled:cursor-not-allowed"
         >
           {isLoading ? (
             <>
               <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
-              {t('generating')}
+              <span>{t('generating')}</span>
             </>
           ) : (
             <>
               <SparklesIcon />
-              {t('generateSummary')}
+              <span>{t('generateSummary')}</span>
             </>
           )}
         </button>
