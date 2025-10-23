@@ -1,0 +1,58 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  # NGINX acts as a reverse proxy and serves the static frontend files
+  nginx:
+    image: nginx:stable-alpine
+    container_name: mgnrega_nginx
+    ports:
+      - "80:80"
+    volumes:
+      # Mounts the built React app into the NGINX container
+      - ./dist:/usr/share/nginx/html
+      # Mounts the custom NGINX configuration
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # The Node.js backend service
+  backend:
+    container_name: mgnrega_backend
+    # This assumes you have a 'backend' directory with a Dockerfile
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      # Pass environment variables to the backend
+      - DATABASE_URL=postgresql://mgnrega_user:mgnrega_password@db:5432/mgnrega_db
+      - REDIS_URL=redis://redis:6379
+      - NODE_ENV=production
+    depends_on:
+      - db
+      - redis
+    restart: unless-stopped
+
+  # PostgreSQL database service
+  db:
+    image: postgres:14-alpine
+    container_name: mgnrega_db
+    environment:
+      - POSTGRES_USER=mgnrega_user
+      - POSTGRES_PASSWORD=mgnrega_password
+      - POSTGRES_DB=mgnrega_db
+    volumes:
+      # Persists database data across container restarts
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  # Redis caching service
+  redis:
+    image: redis:6-alpine
+    container_name: mgnrega_redis
+    restart: unless-stopped
+
+# Defines the named volume for data persistence
+volumes:
+  postgres_data:
